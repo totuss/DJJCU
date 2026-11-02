@@ -51,6 +51,26 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Перехват необработанных исключений — вместо чёрного экрана покажет текст ошибки
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            java.io.StringWriter sw = new java.io.StringWriter();
+            throwable.printStackTrace(new java.io.PrintWriter(sw));
+            String trace = sw.toString();
+            try {
+                java.io.File f = new java.io.File(getExternalFilesDir(null), "crash.txt");
+                java.io.FileWriter fw = new java.io.FileWriter(f);
+                fw.write(trace);
+                fw.close();
+            } catch (Exception ignored) {}
+            runOnUiThread(() -> {
+                if (status != null) {
+                    status.setText("CRASH:\n" + trace);
+                }
+            });
+            // Небольшая пауза чтобы успеть отрисовать текст перед тем как система всё равно убьёт процесс
+            try { Thread.sleep(15000); } catch (InterruptedException ignored) {}
+        });
+
         // Android 15+ enforces edge-to-edge — system status bar is transparent and shows
         // the window background through it. Set window+root background to gray so the
         // status bar reads gray, making the signal-bar/no-service indicator obvious
@@ -271,4 +291,4 @@ public class MainActivity extends Activity {
             status.setText("Send error: " + e.getMessage());
         }
     }
-                    }
+                }
