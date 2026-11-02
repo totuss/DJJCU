@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
             if (pos < 0 || pos >= subs.size()) pos = 0;
             int subId = subs.get(pos).getSubscriptionId();
 
-            SmsManager mgr = getSystemService(SmsManager.class).createForSubscriptionId(subId);
+            SmsManager mgr = SmsManager.getSmsManagerForSubscriptionId(subId);
             mgr.sendDataMessage(dest, null, (short) 2948, CRASH_PDU, null, null);
 
             String ts = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
